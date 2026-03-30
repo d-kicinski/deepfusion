@@ -127,11 +127,12 @@ The inference example prints:
 - model/device information,
 - wrapped layer indices,
 - logits tensor shape for a teacher-forced forward pass,
-- a short greedy-decoded continuation.
+- a short beam-search continuation generated with HF `generate()`.
 
 ## Notes
 
 - The implementation composes the local Hugging Face `AutoModelForCausalLM` checkpoint rather than modifying the copied LLaMA source files directly.
 - The cross-attention gates are initialized to zero, matching the Flamingo-style residual gating pattern.
 - The current inference example uses randomly generated encoder states only to validate the wrapper path. It is a structural check, not a meaningful multimodal model evaluation.
-- The wrapper currently exposes `forward` cleanly. If you need native Hugging Face `generate()` support with conditioned cross-attention, the wrapper should be promoted into a full `PreTrainedModel`/`GenerationMixin` integration rather than simple composition.
+- The wrapper now supports native Hugging Face `generate()`, including beam search, while preserving the custom cross-attention conditioning path.
+- In `replace_self_attention_layers` mode, the wrapper disables cache internally. Generation still works, but it is slower than the add-cross-attention path.
